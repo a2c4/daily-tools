@@ -1,0 +1,390 @@
+<?xml version="1.0"?> 
+<xs:schema targetNamespace="http://org.moten.david/example2" xmlns="http://org.moten.david/example2" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:i="http://moten.david.org/xsd-forms">
+<!--xs:schema targetNamespace="http://barclays.com/example2" xmlns="http://barclays.com/example2" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:i="http://barclays.com/xsd-forms"-->
+  <xs:annotation i:numberItems="true">
+    <xs:appinfo>
+      <i:header><![CDATA[ <h2>Test Automation Framework</h2> ]]></i:header>
+      <i:footer><![CDATA[ <p>Click on the Submit Button to Generate XML</p> ]]></i:footer>
+      <i:extraImports><![CDATA[ <!-- extra imports would go here --> ]]></i:extraImports>
+      <i:extraScript><![CDATA[ // extra script would go here ]]></i:extraScript>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="TestAutomationFramework" type="main"/>
+  <!-- main type definition -->
+  <xs:complexType name="main">
+    <xs:sequence>
+      <xs:element name="CheckOut" type="CheckOut">
+        <xs:annotation i:label="Enter Checkout Information"/>
+      </xs:element>
+      <xs:element name="DetailedInput" maxOccurs="unbounded" type="DetailedInput">
+        <xs:annotation i:label="Input Details" i:repeatLabel="Generate another Input"/>
+      </xs:element>
+      <xs:element name="RunProcesses" maxOccurs="unbounded" type="ProcessList">
+        <xs:annotation i:nonRepeatingTitle="Enter Executables Project wise" i:repeatLabel="Add another project"/>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- complex type definitions -->
+  <xs:complexType name="DetailedInput">
+    <xs:choice>
+      <xs:annotation i:label="Select Input file Generation Method"/>
+      <xs:element name="Input" type="copy">
+        <xs:annotation i:choiceLabel="Copy File from Another Location"/>
+      </xs:element>
+      <xs:element name="Input" type="exact">
+        <xs:annotation i:choiceLabel="Use already in-placed File"/>
+      </xs:element>
+      <xs:element name="Input" type="generate">
+        <xs:annotation i:choiceLabel="Generate File"/>
+      </xs:element>
+      <xs:element name="Input" type="datecontrol">
+        <xs:annotation i:choiceLabel="Create Date Control File"/>
+      </xs:element>
+      <xs:element name="Input" type="holidaylist">
+        <xs:annotation i:choiceLabel="Create Holiday List File"/>
+      </xs:element>
+      <xs:element name="Input" type="customconfig">
+        <xs:annotation i:choiceLabel="Create Other Config File"/>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  
+  <xs:complexType name="customconfig">
+    <xs:sequence>
+      <xs:element name="ID" type="tda_input_id"/>
+      <xs:element name="ProjectPath" type="path"/>
+      <xs:element name="OutputFile" type="path"/>
+      <xs:element name="Type" type="record"/>
+      <xs:element name="RecCount" type="rec_count"/>
+      <xs:element name="FieldsInfo" type="customFieldsInfo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="customFieldsInfo">
+    <xs:sequence>
+      <xs:element name="Entry" type="customEntry"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="customEntry">
+    <xs:sequence>
+      <xs:element name="Field" default="Enter Field" type="field"/>
+      <xs:element name="Constraints" type="customConstraints"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="customConstraints">
+    <xs:sequence>
+      <xs:element name="Constraint" type="customConstraint"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="customConstraints">
+    <xs:sequence>
+      <xs:element name="Type" default="Rule23: Populate this field with specified values in order" type="xs:string"/>
+      <xs:element name="Value" type="non-blank-string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="holidaylist">
+    <xs:sequence>
+      <xs:element name="ID" type="tda_input_id"/>
+      <xs:element name="ProjectPath" type="path"/>
+      <xs:element name="OutputFile" type="path"/>
+      <xs:element name="Type" default="record date('YYYY-MM-DD') holiday; string('\n',maximum_length=0) nl_char; end" type="record">
+        <xs:annotation i:after="Do not change pre-filled textboxes unless necessary"/>
+      </xs:element>
+      <xs:element name="SortKey" default="{holiday}" type="key"/>
+      <xs:element name="RecCount" type="rec_count"/>
+      <xs:element name="FieldsInfo" type="holidayFieldsInfo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="holidayFieldsInfo">
+    <xs:sequence>
+      <xs:element name="Entry" type="holidayEntry"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="holidayEntry">
+    <xs:sequence>
+      <xs:element name="Field" default="holiday" type="field"/>
+      <xs:element name="Constraints" type="holidayConstraints"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="holidayConstraints">
+    <xs:sequence>
+      <xs:element name="Constraint" type="holidayConstraint"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="holidayConstraint">
+    <xs:sequence>
+      <xs:element name="Type" default="Rule23: Populate this field with specified values in order" type="xs:string"/>
+      <xs:element name="Value" type="non-blank-string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="datecontrol">
+    <xs:sequence>
+      <xs:element name="ID" type="tda_input_id"/>
+      <xs:element name="ProjectPath" type="path"/>
+      <xs:element name="OutputFile" type="path"/>
+      <xs:element name="Type" default="record string('\n') line; end" type="record">
+        <xs:annotation i:after="Do not change unless necessary"/>
+      </xs:element>
+      <xs:element name="RecCount" default="1" type="rec_count"/>
+      <xs:element name="FieldsInfo" type="dateControlFieldsInfo"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dateControlFieldsInfo">
+    <xs:sequence>
+      <xs:element name="Entry" type="dateControlEntry"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dateControlEntry">
+    <xs:sequence>
+      <xs:element name="Field" default="line" type="field"/>
+      <xs:element name="Constraints" type="dateControlConstraints"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dateControlConstraints">
+    <xs:sequence>
+      <xs:element name="Constraint" type="dateControlConstraint"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dateControlConstraint">
+    <xs:sequence>
+      <xs:element name="Type" default="Rule23: Populate this field with specified values in order" type="xs:string"/>
+      <xs:element name="Value" type="non-blank-string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="generate">
+    <xs:sequence>
+      <xs:annotation i:label="Enter Source and Target Location along with Project"/>
+      <xs:element name="ID" type="tda_input_id"/>
+      <xs:element name="ProjectPath" type="path"/>
+      <xs:element name="DMLPath" type="path"/>
+      <xs:element name="OutputFile" type="path"/>
+      <xs:element name="TypeName" type="xs:string"/>
+      <xs:element name="PartitionType" default="" type="partition">
+        <xs:annotation i:label="Select Partition Type" i:addBlank="false"/>
+      </xs:element>
+      <xs:element name="PartitionKey" type="key"/>
+      <xs:element name="SortKey" type="key"/>
+      <xs:element name="RecCount" default="50" type="rec_count"/>
+      <xs:element name="FieldsInfo" minOccurs="0" maxOccurs="unbounded" type="FieldsInfo">
+        <xs:annotation i:nonRepeatingTitle="Field Level Rule" i:repeatLabel="Add another Field Rule"/>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="FieldsInfo">
+    <xs:sequence>
+      <xs:element name="Entry" type="Entry"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Entry">
+    <xs:sequence>
+      <xs:element name="Field" default="Enter Field" type="field"/>
+      <xs:element name="Constraints" type="Constraints"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Constraints">
+    <xs:sequence>
+      <xs:element name="Constraint" type="Constraint"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="Constraint">
+    <xs:sequence>
+      <xs:element name="Type" type="rule"/>
+      <xs:element name="Value" type="xs:string"/>
+      <xs:element name="RefKey" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Later Used, From Here-->
+  <xs:complexType name="TypeInfo">
+    <xs:sequence>
+      <xs:choice>
+        <xs:annotation i:label="Select Type Idetifier"/>
+        <xs:element name="DMLPath" type="DMLPath">
+          <xs:annotation i:choiceLabel="Existing DML"/>
+        </xs:element>
+        <xs:element name="DMLPath" type="path">
+          <xs:annotation i:choiceLabel="Enter type manually"/>
+        </xs:element>
+      </xs:choice>
+      <xs:element name="TypeName" type="type"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Till Here-->
+  <xs:complexType name="DMLPath">
+    <xs:sequence> </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="copy">
+    <xs:sequence>
+      <xs:annotation i:label="Enter Source and Target Location along with Project"/>
+      <xs:element name="ID" type="tda_input_id"/>
+      <xs:element name="ProjectPath" type="path"/>
+      <xs:element name="InputFile" type="path"/>
+      <xs:element name="OutputFile" type="path"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="exact">
+    <xs:sequence>
+      <xs:annotation i:label="Enter Already Existing File Location along with Project"/>
+      <xs:element name="ID" type="tda_input_id"/>
+      <xs:element name="ProjectPath" type="path"/>
+      <xs:element name="InputFile" type="path"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProcessList">
+    <xs:sequence>
+      <xs:element name="ProcessList">
+        <xs:annotation i:label="Project Executables "/>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ProjectPath" type="path"/>
+            <xs:element name="Processes" maxOccurs="unbounded" type="ProcessInfo">
+              <xs:annotation i:nonRepeatingTitle="Executables" i:repeatLabel="Add another Executable"/>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ProcessInfo">
+    <xs:sequence>
+      <xs:element name="ProcessInfo">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RunProcess" type="path"/>
+            <xs:element name="Priority" type="priority" default="1"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CheckOut">
+    <xs:sequence>
+      <xs:element name="ScriptPath" type="path"/>
+      <xs:element name="CheckOutDir" type="path"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- simple type definitions -->
+  <xs:simpleType name="rule">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Rule11: Populate this field with random Alpha-Numeric values"/>
+      <xs:enumeration value="Rule12: Populate this field with unique Numeric values"/>
+      <xs:enumeration value="Rule13: Populate this field with random Alphabetical values"/>
+      <xs:enumeration value="Rule14: Populate this field with random upper Alphabetical values"/>
+      <xs:enumeration value="Rule15: Populate this field with random lower Alphabetical values"/>
+      <xs:enumeration value="Rule21: Populate this field from another field"/>
+      <xs:enumeration value="Rule22: Populate this field with specified values"/>
+      <xs:enumeration value="Rule23: Populate this field with specified values in order"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="partition">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Select One"/>
+      <xs:enumeration value="Partition By Key"/>
+      <xs:enumeration value="Partition By Round Robin"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="key">
+    <xs:restriction base="xs:string">
+      <!--To change-->
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="path">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="field">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="type">
+    <xs:restriction base="xs:string">
+      <!--To change-->
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="record">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="tda_input_id">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:minInclusive value="101"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="rec_count">
+    <xs:restriction base="xs:nonNegativeInteger">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="5"/>
+      <xs:enumeration value="6"/>
+      <xs:enumeration value="7"/>
+      <xs:enumeration value="8"/>
+      <xs:enumeration value="9"/>
+      <xs:enumeration value="10"/>
+      <xs:enumeration value="11"/>
+      <xs:enumeration value="12"/>
+      <xs:enumeration value="13"/>
+      <xs:enumeration value="14"/>
+      <xs:enumeration value="15"/>
+      <xs:enumeration value="16"/>
+      <xs:enumeration value="17"/>
+      <xs:enumeration value="18"/>
+      <xs:enumeration value="19"/>
+      <xs:enumeration value="20"/>
+      <xs:enumeration value="21"/>
+      <xs:enumeration value="22"/>
+      <xs:enumeration value="23"/>
+      <xs:enumeration value="24"/>
+      <xs:enumeration value="25"/>
+      <xs:enumeration value="26"/>
+      <xs:enumeration value="27"/>
+      <xs:enumeration value="28"/>
+      <xs:enumeration value="29"/>
+      <xs:enumeration value="30"/>
+      <xs:enumeration value="31"/>
+      <xs:enumeration value="32"/>
+      <xs:enumeration value="33"/>
+      <xs:enumeration value="34"/>
+      <xs:enumeration value="35"/>
+      <xs:enumeration value="36"/>
+      <xs:enumeration value="37"/>
+      <xs:enumeration value="38"/>
+      <xs:enumeration value="39"/>
+      <xs:enumeration value="40"/>
+      <xs:enumeration value="41"/>
+      <xs:enumeration value="42"/>
+      <xs:enumeration value="43"/>
+      <xs:enumeration value="44"/>
+      <xs:enumeration value="45"/>
+      <xs:enumeration value="46"/>
+      <xs:enumeration value="47"/>
+      <xs:enumeration value="48"/>
+      <xs:enumeration value="49"/>
+      <xs:enumeration value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="priority">
+    <xs:restriction base="xs:positiveInteger">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="5"/>
+      <xs:enumeration value="6"/>
+      <xs:enumeration value="7"/>
+      <xs:enumeration value="8"/>
+      <xs:enumeration value="9"/>
+      <xs:enumeration value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="non-blank-string">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
